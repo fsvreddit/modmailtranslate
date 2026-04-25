@@ -2,6 +2,8 @@ A translation app for Modmail.
 
 This app supports two commands to translate text in Modmail, with the intention being to translate foreign communication from a user to and from a language that the mod team can work with.
 
+Note: You need to set up an OpenAI API key to use this app, although ten free translations are being funded by the developer for new installs before a key is required.
+
 ### Translating a user's message
 
 Use the command `!translatethat` on its own in a modmail. The app will find the last message from the user and translate it to the language you have configured in the app's settings. It will tell you what the language.
