@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "name": "modmailtranslate",
+  "version": "0.0.0",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "deploy": "npm run type-check && npm run lint && npm run test && devvit upload",
+    "dev": "devvit playtest",
+    "launch": "npm run deploy && devvit publish",
+    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "login": "devvit login",
+    "prettier": "prettier --write .",
+    "test": "vitest run",
+    "type-check": "tsc --build"
+  },
+  "engines": {
+    "node": ">=22.2.0"
+  },
+  "dependencies": {
+    "@devvit/start": "0.12.20",
+    "@devvit/web": "0.12.20",
+    "@hono/node-server": "^2.0.0",
+    "date-fns": "^4.1.0",
+    "devvit": "0.12.20",
+    "hono": "^4.11.7",
+    "openai": "^6.34.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@fsvreddit/eslint-config": "github:fsvreddit/eslint-config",
+    "@types/node": "^22.19.7",
+    "eslint": "^10.0.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.1"
+  }
+}

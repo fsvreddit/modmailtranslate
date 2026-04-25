@@ -1,0 +1,151 @@
+{
+  "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
+  "name": "modmailtranslate",
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
+  "menu": {
+    "items": [
+      {
+        "label": "Set Modmail Translator OpenAI Key",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/set-openai-key"
+      }
+    ]
+  },
+  "forms": {
+    "set-openai-key": "/internal/form/set-openai-key"
+  },
+  "triggers": {
+    "onModMail": "/internal/triggers/on-modmail"
+  },
+  "settings": {
+    "subreddit": {
+      "language": {
+        "type": "select",
+        "label": "Choose a language to translate to",
+        "options": [
+          {
+            "label": "English",
+            "value": "en"
+          },
+          {
+            "label": "Arabic",
+            "value": "ar"
+          },
+          {
+            "label": "Chinese",
+            "value": "zh"
+          },
+          {
+            "label": "Dutch",
+            "value": "nl"
+          },
+          {
+            "label": "French",
+            "value": "fr"
+          },
+          {
+            "label": "German",
+            "value": "de"
+          },
+          {
+            "label": "Greek",
+            "value": "el"
+          },
+          {
+            "label": "Hindi",
+            "value": "hi"
+          },
+          {
+            "label": "Indonesian",
+            "value": "id"
+          },
+          {
+            "label": "Italian",
+            "value": "it"
+          },
+          {
+            "label": "Japanese",
+            "value": "ja"
+          },
+          {
+            "label": "Korean",
+            "value": "ko"
+          },
+          {
+            "label": "Polish",
+            "value": "pl"
+          },
+          {
+            "label": "Portuguese",
+            "value": "pt"
+          },
+          {
+            "label": "Russian",
+            "value": "ru"
+          },
+          {
+            "label": "Spanish",
+            "value": "es"
+          },
+          {
+            "label": "Swedish",
+            "value": "sv"
+          },
+          {
+            "label": "Thai",
+            "value": "th"
+          },
+          {
+            "label": "Turkish",
+            "value": "tr"
+          },
+          {
+            "label": "Vietnamese",
+            "value": "vi"
+          }
+        ],
+        "defaultValue": "en",
+        "validationEndpoint": "/internal/validators/select-field-has-option-chosen"
+      }
+    },
+    "global": {
+      "openAPIKey": {
+        "label": "OpenAPI Key",
+        "type": "string",
+        "isSecret": true
+      },
+      "freeTries": {
+        "label": "Number of free translations before the OpenAI key is required",
+        "type": "number",
+        "defaultValue": 10
+      },
+      "openAIModel": {
+        "label": "OpenAI Model to use for translations",
+        "type": "string",
+        "defaultValue": "gpt-5.4-mini"
+      }
+    }
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "permissions": {
+    "reddit": true,
+    "http": {
+      "domains": [
+        "api.openapi.com"
+      ]
+    }
+  },
+  "dev": {
+    "subreddit": "fsvsandbox"
+  },
+  "marketingAssets": {
+    "icon": "assets/icon.png"
+  }
+}
