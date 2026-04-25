@@ -32,10 +32,12 @@ export async function handleTranslateThat (message: ModmailMessage): Promise<Tri
         return { message: `API key not configured for ${message.conversationId}` };
     }
 
+    const appSettings = await settings.getAll();
+
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });
-    const model = await settings.get<string>("openAIModel") ?? "gpt-5.4-mini";
-    const targetLanguageValue = await settings.get<string>(AppSetting.Language) ?? "en";
-    const targetLanguage = languages[targetLanguageValue] ?? "English";
+    const model = appSettings[AppSetting.OpenAIModel] as string | undefined ?? "gpt-5.4-mini";
+    const [targetLanguageValue] = appSettings[AppSetting.Language] as string[] | undefined ?? ["en"];
+    const targetLanguage = languages[targetLanguageValue ?? "en"] ?? "English";
 
     const response = await openAi.responses.create({
         model,
