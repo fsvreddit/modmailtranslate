@@ -9,10 +9,5 @@
     "rootDir": "../src/server"
   },
   "include": ["../src/server/**/*"],
-  "exclude": [],
-  "references": [
-    {
-      "path": "./tsconfig.shared.json"
-    }
-  ]
+  "exclude": []
 }

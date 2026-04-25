@@ -36,12 +36,28 @@
             "value": "ar"
           },
           {
+            "label": "Bengali",
+            "value": "bn"
+          },
+          {
             "label": "Chinese",
             "value": "zh"
           },
           {
+            "label": "Czech",
+            "value": "cs"
+          },
+          {
+            "label": "Danish",
+            "value": "da"
+          },
+          {
             "label": "Dutch",
             "value": "nl"
+          },
+          {
+            "label": "Finnish",
+            "value": "fi"
           },
           {
             "label": "French",
@@ -54,6 +70,10 @@
           {
             "label": "Greek",
             "value": "el"
+          },
+          {
+            "label": "Hebrew",
+            "value": "he"
           },
           {
             "label": "Hindi",
@@ -76,12 +96,24 @@
             "value": "ko"
           },
           {
+            "label": "Malay",
+            "value": "ms"
+          },
+          {
+            "label": "Norwegian",
+            "value": "no"
+          },
+          {
             "label": "Polish",
             "value": "pl"
           },
           {
             "label": "Portuguese",
             "value": "pt"
+          },
+          {
+            "label": "Romanian",
+            "value": "ro"
           },
           {
             "label": "Russian",
@@ -96,12 +128,24 @@
             "value": "sv"
           },
           {
+            "label": "Tagalog",
+            "value": "tl"
+          },
+          {
             "label": "Thai",
             "value": "th"
           },
           {
             "label": "Turkish",
             "value": "tr"
+          },
+          {
+            "label": "Ukrainian",
+            "value": "uk"
+          },
+          {
+            "label": "Urdu",
+            "value": "ur"
           },
           {
             "label": "Vietnamese",
