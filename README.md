@@ -8,7 +8,7 @@ Note: You need to set up an OpenAI API key to use this app, although ten free tr
 
 Use the command `!translatethat` on its own in a modmail. The app will find the last message from the user and translate it to the language you have configured in the app's settings. It will tell you what the language.
 
-The app will translate the text of the previous message and respond as a private moderator note.
+The app will translate the text of the previous message and respond as a private moderator note. Please remember to use a private mod note when issuing the command.
 
 ### Translating a message to a user
 
@@ -24,7 +24,7 @@ or if you want to specify the language:
 >
 > All posts on r/Rateme must include a verification image showing you holding a paper sign with the words "Rate me" on it
 
-The app will translate the text to the language specified and respond to the user as the mod team.
+The app will translate the text to the language specified and respond to the user as the mod team. Please remember to use a private mod note when issuing the command.
 
 ## Fetch Domains
 
