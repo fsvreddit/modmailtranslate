@@ -1,11 +1,10 @@
-
-# Spam Source Spotter
+# Modmail Translator
 
 ## Privacy Policy
 
 Data on Reddit falls under the [Reddit Privacy Policy](https://www.reddit.com/policies/privacy-policy).
 
-This app uses the OpenAI API to provide translation services, so any text you send for translation is sent over to OpenAI. 
+This app uses the OpenAI API to provide translation services, so any text you send for translation is sent over to OpenAI.
 
 ### Data captured by the app
 
