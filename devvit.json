@@ -190,7 +190,7 @@
     "reddit": true,
     "http": {
       "domains": [
-        "api.openapi.com"
+        "api.openai.com"
       ]
     }
   },
