@@ -6,6 +6,21 @@ import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
 import json2md from "json2md";
 
+async function replyWithTranslationError (conversationId: string, errorMessage: string) {
+    await reddit.modMail.reply({
+        conversationId,
+        body: json2md([
+            { p: "An error occurred while trying to translate the message. Error from OpenAI:" },
+            { blockquote: errorMessage },
+        ]),
+        isInternal: true,
+    });
+}
+
+function getErrorMessage (error: unknown): string {
+    return error instanceof Error ? error.message : "Unknown error";
+}
+
 export async function handleTranslateUserMessage (message: ModmailMessage, isAuto = false): Promise<TriggerResponse> {
     const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
     if (!lastMessageFromUser?.bodyMarkdown) {
@@ -40,37 +55,46 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
     const [targetLanguageValue] = appSettings[AppSetting.Language] as string[] | undefined ?? ["en"];
     const targetLanguage = getLanguage(targetLanguageValue) ?? "English";
 
-    const response = await openAi.responses.create({
-        model,
-        input: [
-            {
-                role: "system",
-                content: `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`,
+    let response;
+    try {
+        response = await openAi.responses.create({
+            model,
+            input: [
+                {
+                    role: "system",
+                    content: `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`,
+                },
+                {
+                    role: "user",
+                    content: lastMessageFromUser.bodyMarkdown,
+                },
+            ],
+            text: {
+                format: zodTextFormat(responseFormat, "response"),
             },
-            {
-                role: "user",
-                content: lastMessageFromUser.bodyMarkdown,
-            },
-        ],
-        text: {
-            format: zodTextFormat(responseFormat, "response"),
-        },
-    });
+        });
+    } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        console.error(`${message.messageId}: Error calling OpenAI for conversation ${message.conversationId}`, error);
+        await replyWithTranslationError(message.conversationId, errorMessage);
+        return { message: `error from OpenAI API: ${errorMessage}` };
+    }
 
     if (response.error?.message) {
         console.error("Error from OpenAI API:", response.error.message);
-        await reddit.modMail.reply({
-            conversationId: message.conversationId,
-            body: json2md([
-                { p: "An error occurred while trying to translate the message. Error from OpenAI:" },
-                { blockquote: response.error.message },
-            ]),
-            isInternal: true,
-        });
+        await replyWithTranslationError(message.conversationId, response.error.message);
         return { message: `error from OpenAI API: ${response.error.message}` };
     }
 
-    const output = JSON.parse(response.output_text) as z.infer<typeof responseFormat>;
+    let output;
+    try {
+        output = responseFormat.parse(JSON.parse(response.output_text));
+    } catch (error) {
+        const errorMessage = `Could not parse structured translation response: ${getErrorMessage(error)}`;
+        console.error(`${message.messageId}: Invalid structured response from OpenAI for conversation ${message.conversationId}`, error);
+        await replyWithTranslationError(message.conversationId, errorMessage);
+        return { message: "invalid OpenAI response format" };
+    }
 
     if (isAuto && output.detectedLanguage === targetLanguage) {
         console.log(`${message.messageId}: Detected language is the same as target language ${targetLanguage} in auto-translate mode. Skipping translation for conversation ${message.conversationId}`);
