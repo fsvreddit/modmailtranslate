@@ -10,6 +10,8 @@ Use the command `!translate` **on its own** in a modmail. The app will find the 
 
 The app will translate the text of the previous message and respond as a private moderator note. Please remember to use a private mod note when issuing the command.
 
+If you turn the "Continuous translation mode" option on in settings, subsequent messages from the user will be automatically translated without having to issue a `!translate` command, but only after you have triggered it once.
+
 ### Translating a message to a user
 
 Use the command `!translate` or `!translate French` or similar along with the message you wish to translate on subsequent lines. If you have already translated a message from the user, it will assume you want to translate to the language the user used. For example:
@@ -25,6 +27,10 @@ or if you want to specify the language:
 > All posts on r/Rateme must include a verification image showing you holding a paper sign with the words "Rate me" on it
 
 The app will translate the text to the language specified and respond to the user as the mod team. Please remember to use a private mod note when issuing the command.
+
+## Source code
+
+Modmail Translator is open source under the BSD three-clause license. [You can find the source code on Github](https://github.com/fsvreddit/modmailtranslate).
 
 ## Fetch Domains
 
