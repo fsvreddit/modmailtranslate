@@ -12,8 +12,13 @@ export async function handleTranslateThat (message: ModmailMessage): Promise<Tri
     }
 
     const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
-    if (!lastMessageFromUser?.body) {
+    if (!lastMessageFromUser?.bodyMarkdown) {
         console.error("Modmail: Last message from user not found");
+        await reddit.modMail.reply({
+            conversationId: message.conversationId,
+            body: `Could not find a message to translate from u/${message.participant}.`,
+            isInternal: true,
+        });
         return { message: "last message from user not found" };
     }
 
@@ -48,7 +53,7 @@ export async function handleTranslateThat (message: ModmailMessage): Promise<Tri
             },
             {
                 role: "user",
-                content: lastMessageFromUser.body,
+                content: lastMessageFromUser.bodyMarkdown,
             },
         ],
         text: {
