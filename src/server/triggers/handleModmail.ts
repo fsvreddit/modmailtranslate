@@ -34,7 +34,7 @@ export const handleModmail = async (c: Context) => {
 
     if (!conversation.conversation.participant?.name) {
         console.log(`${modmailRequest.messageId}: Conversation participant not found for conversation ${modmailRequest.conversationId}`);
-        return c.json<TriggerResponse>({ message: "conversation participant not found" }, 404);
+        return c.json<TriggerResponse>({ message: "conversation participant not found" }, 200);
     }
 
     const messagesInConversation = Object.values(conversation.conversation.messages).reverse();
