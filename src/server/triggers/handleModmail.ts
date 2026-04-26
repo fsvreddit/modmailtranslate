@@ -6,6 +6,10 @@ import { AppSetting, getLanguageForConversation, handleTranslateUserMessage, han
 export const handleModmail = async (c: Context) => {
     const modmailRequest = await c.req.json<OnModMailRequest>();
 
+    if (modmailRequest.messageAuthor?.name === context.appSlug) {
+        return c.json<TriggerResponse>({ message: "ignoring message sent by the app itself" }, 200);
+    }
+
     console.log(`Received modmail request from ${modmailRequest.messageAuthorType}: ${modmailRequest.messageAuthor?.name}`);
 
     console.log(`${modmailRequest.messageId}: Received modmail message from moderator ${modmailRequest.messageAuthor?.name}`);
@@ -38,10 +42,6 @@ export const handleModmail = async (c: Context) => {
     if (!currentMessage?.bodyMarkdown) {
         console.error(`${modmailRequest.messageId}: Current message not found`);
         return c.json<TriggerResponse>({ message: "current message not found" }, 400);
-    }
-
-    if (currentMessage.author?.name === context.appSlug) {
-        return c.json<TriggerResponse>({ message: "ignoring message sent by the app itself" }, 200);
     }
 
     const modmailMessage: ModmailMessage = {
