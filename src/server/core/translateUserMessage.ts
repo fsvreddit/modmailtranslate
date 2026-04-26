@@ -4,6 +4,7 @@ import { AppSetting, getAPIKey, getLanguage, incrementFreeTrialUses, ModmailMess
 import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
+import json2md from "json2md";
 
 export async function handleTranslateUserMessage (message: ModmailMessage): Promise<TriggerResponse> {
     const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
@@ -44,7 +45,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage): Prom
         input: [
             {
                 role: "system",
-                content: `You are a helpful assistant that detects the language of the provided message and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`,
+                content: `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`,
             },
             {
                 role: "user",
@@ -60,7 +61,10 @@ export async function handleTranslateUserMessage (message: ModmailMessage): Prom
 
     await reddit.modMail.reply({
         conversationId: message.conversationId,
-        body: `**Detected Language:** ${output.detectedLanguage}. **Translation:**\n\n${output.translatedText}`,
+        body: json2md([
+            { p: `Detected Language: ${output.detectedLanguage}. Translation::` },
+            { blockquote: output.translatedText },
+        ]),
         isInternal: true,
     });
 

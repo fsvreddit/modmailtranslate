@@ -52,7 +52,7 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
         input: [
             {
                 role: "system",
-                content: `You are a helpful assistant that translates messages to ${language}. Translate the attached message to ${language}, preserving the original markdown format if any.`,
+                content: `You are a helpful assistant that translates messages on Reddit to ${language}. Translate the attached message to ${language}, preserving the original markdown format if any.`,
             },
             {
                 role: "user",
