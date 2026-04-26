@@ -154,6 +154,12 @@
         ],
         "defaultValue": "en",
         "validationEndpoint": "/internal/validators/select-field-has-option-chosen"
+      },
+      "continuousTranslation": {
+        "type": "boolean",
+        "label": "Continuous translation mode",
+        "helpText": "Continues to translate messages from the same user in the same conversation after the first mod-initiated translation",
+        "defaultValue": false
       }
     },
     "global": {

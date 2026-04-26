@@ -1,4 +1,19 @@
-export const languages: Record<string, string> = {
+import { redis } from "@devvit/web/server";
+import { addDays } from "date-fns";
+
+function getLanguageKeyForConversation (conversationId: string): string {
+    return `languageForConversation:${conversationId}`;
+}
+
+export async function setLanguageForConversation (conversationId: string, language: string) {
+    await redis.set(getLanguageKeyForConversation(conversationId), language, { expiration: addDays(new Date(), 28) });
+}
+
+export async function getLanguageForConversation (conversationId: string): Promise<string | undefined> {
+    return await redis.get(getLanguageKeyForConversation(conversationId));
+}
+
+export const LANGUAGES: Record<string, string> = {
     en: "English",
     ar: "Arabic",
     bn: "Bengali",
@@ -31,3 +46,7 @@ export const languages: Record<string, string> = {
     ur: "Urdu",
     vi: "Vietnamese",
 };
+
+export function getLanguage (languageCode: string): string | undefined {
+    return LANGUAGES[languageCode];
+}

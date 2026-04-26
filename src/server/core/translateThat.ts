@@ -1,6 +1,6 @@
 import { reddit, settings } from "@devvit/web/server";
 import { TriggerResponse } from "@devvit/web/shared";
-import { AppSetting, getAPIKey, incrementFreeTrialUses, languages, ModmailMessage, setLanguageForMessage } from ".";
+import { AppSetting, getAPIKey, getLanguage, incrementFreeTrialUses, ModmailMessage, setLanguageForConversation } from ".";
 import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
@@ -42,7 +42,7 @@ export async function handleTranslateThat (message: ModmailMessage): Promise<Tri
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });
     const model = appSettings[AppSetting.OpenAIModel] as string | undefined ?? "gpt-5.4-mini";
     const [targetLanguageValue] = appSettings[AppSetting.Language] as string[] | undefined ?? ["en"];
-    const targetLanguage = languages[targetLanguageValue ?? "en"] ?? "English";
+    const targetLanguage = getLanguage(targetLanguageValue ?? "en") ?? "English";
 
     const response = await openAi.responses.create({
         model,
@@ -69,7 +69,7 @@ export async function handleTranslateThat (message: ModmailMessage): Promise<Tri
         isInternal: true,
     });
 
-    await setLanguageForMessage(message.conversationId, output.detectedLanguage);
+    await setLanguageForConversation(message.conversationId, output.detectedLanguage);
 
     console.log(`${message.messageId}: Successfully translated message from ${output.detectedLanguage} to English and replied in modmail conversation ${message.conversationId}`);
     if (apiKeyResponse.type === "global") {

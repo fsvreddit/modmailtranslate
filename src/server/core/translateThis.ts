@@ -1,5 +1,5 @@
 import { TriggerResponse } from "@devvit/web/shared";
-import { getAPIKey, getLanguageForMessage, incrementFreeTrialUses, ModmailMessage, setLanguageForMessage } from ".";
+import { getAPIKey, getLanguageForConversation, incrementFreeTrialUses, ModmailMessage, setLanguageForConversation } from ".";
 import { reddit, settings } from "@devvit/web/server";
 import OpenAI from "openai";
 
@@ -12,7 +12,7 @@ export async function handleTranslateThis (message: ModmailMessage): Promise<Tri
     }
 
     let language = matches[1]?.trim();
-    language ??= await getLanguageForMessage(message.conversationId);
+    language ??= await getLanguageForConversation(message.conversationId);
 
     if (!language) {
         await reddit.modMail.reply({
@@ -43,7 +43,7 @@ export async function handleTranslateThis (message: ModmailMessage): Promise<Tri
         return { message: `API key not configured for ${message.conversationId}` };
     }
 
-    await setLanguageForMessage(message.conversationId, language);
+    await setLanguageForConversation(message.conversationId, language);
     const model = await settings.get<string>("openAIModel") ?? "gpt-5.4-mini";
 
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });

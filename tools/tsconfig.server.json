@@ -4,7 +4,7 @@
     "outDir": "../dist/types/server",
     "tsBuildInfoFile": "../dist/types/server/tsconfig.tsbuildinfo",
     "customConditions": [],
-    "types": ["node"],
+    "types": ["node", "vitest/globals"],
     "exactOptionalPropertyTypes": false,
     "rootDir": "../src/server"
   },
