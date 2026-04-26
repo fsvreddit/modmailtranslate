@@ -10,6 +10,11 @@ export const handleModmail = async (c: Context) => {
         return c.json<TriggerResponse>({ message: "ignoring message sent by the app itself" }, 200);
     }
 
+    if (modmailRequest.conversationType !== "sr_user") {
+        console.log(`${modmailRequest.messageId}: Conversation ${modmailRequest.conversationId} is not a user conversation. Ignoring modmail request.`);
+        return c.json<TriggerResponse>({ message: "conversation is not a user conversation" }, 200);
+    }
+
     console.log(`Received modmail request from ${modmailRequest.messageAuthorType}: ${modmailRequest.messageAuthor?.name}`);
 
     console.log(`${modmailRequest.messageId}: Received modmail message from moderator ${modmailRequest.messageAuthor?.name}`);
