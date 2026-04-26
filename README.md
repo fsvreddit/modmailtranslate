@@ -2,7 +2,9 @@ A translation app for Modmail.
 
 This app supports a `!translate` command to translate text in Modmail, with the intention being to translate foreign communication from a user to and from a language that the mod team can work with.
 
-Note: You need to set up an OpenAI API key to use this app, although ten free translations per subreddit are being funded by the developer before a key is required. Token usage for this app is very low so costs should be minimal.
+Note: You need to set up an OpenAI API key to use this app, although 25 free translations per subreddit are being funded by the developer before a key is required. Token usage for this app is very low so costs should be minimal.
+
+Modmail Translator uses the gpt-5.4-mini model to handle requests.
 
 ### Translating a user's message
 

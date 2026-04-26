@@ -171,7 +171,7 @@
       "freeTries": {
         "label": "Number of free translations before the OpenAI key is required",
         "type": "number",
-        "defaultValue": 10
+        "defaultValue": 25
       },
       "openAIModel": {
         "label": "OpenAI Model to use for translations",
