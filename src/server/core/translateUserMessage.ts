@@ -38,7 +38,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage): Prom
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });
     const model = appSettings[AppSetting.OpenAIModel] as string | undefined ?? "gpt-5.4-mini";
     const [targetLanguageValue] = appSettings[AppSetting.Language] as string[] | undefined ?? ["en"];
-    const targetLanguage = getLanguage(targetLanguageValue ?? "en") ?? "English";
+    const targetLanguage = getLanguage(targetLanguageValue) ?? "English";
 
     const response = await openAi.responses.create({
         model,
@@ -70,7 +70,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage): Prom
 
     await setLanguageForConversation(message.conversationId, output.detectedLanguage);
 
-    console.log(`${message.messageId}: Successfully translated message from ${output.detectedLanguage} to English and replied in modmail conversation ${message.conversationId}`);
+    console.log(`${message.messageId}: Successfully translated message from ${output.detectedLanguage} to ${targetLanguage} and replied in modmail conversation ${message.conversationId}`);
     if (apiKeyResponse.type === "global") {
         await incrementFreeTrialUses();
     }

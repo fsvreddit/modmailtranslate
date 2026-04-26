@@ -47,6 +47,6 @@ export const LANGUAGES: Record<string, string> = {
     vi: "Vietnamese",
 };
 
-export function getLanguage (languageCode: string): string | undefined {
-    return LANGUAGES[languageCode];
+export function getLanguage (languageCode?: string): string | undefined {
+    return LANGUAGES[languageCode ?? "en"];
 }
