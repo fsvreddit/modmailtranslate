@@ -1,12 +1,12 @@
 import { redis } from "@devvit/web/server";
-import { addDays } from "date-fns";
+import { addMonths } from "date-fns";
 
 function getLanguageKeyForConversation (conversationId: string): string {
     return `languageForConversation:${conversationId}`;
 }
 
 export async function setLanguageForConversation (conversationId: string, language: string) {
-    await redis.set(getLanguageKeyForConversation(conversationId), language, { expiration: addDays(new Date(), 28) });
+    await redis.set(getLanguageKeyForConversation(conversationId), language, { expiration: addMonths(new Date(), 3) });
 }
 
 export async function getLanguageForConversation (conversationId: string): Promise<string | undefined> {
