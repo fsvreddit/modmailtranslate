@@ -2,6 +2,7 @@ import { TriggerResponse } from "@devvit/web/shared";
 import { getAPIKey, getLanguageForConversation, incrementFreeTrialUses, ModmailMessage, setLanguageForConversation } from ".";
 import { reddit, settings } from "@devvit/web/server";
 import OpenAI from "openai";
+import json2md from "json2md";
 
 export async function handleTranslateModMessage (message: ModmailMessage): Promise<TriggerResponse> {
     const regex = /!translate( .+)?\n/;
@@ -60,6 +61,19 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
             },
         ],
     });
+
+    if (response.error?.message) {
+        console.error("Error from OpenAI API:", response.error.message);
+        await reddit.modMail.reply({
+            conversationId: message.conversationId,
+            body: json2md([
+                { p: "An error occurred while trying to translate the message. Error from OpenAI:" },
+                { blockquote: response.error.message },
+            ]),
+            isInternal: true,
+        });
+        return { message: `error from OpenAI API: ${response.error.message}` };
+    }
 
     await reddit.modMail.reply({
         conversationId: message.conversationId,

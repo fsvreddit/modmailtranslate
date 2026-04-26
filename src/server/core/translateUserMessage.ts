@@ -57,6 +57,19 @@ export async function handleTranslateUserMessage (message: ModmailMessage): Prom
         },
     });
 
+    if (response.error?.message) {
+        console.error("Error from OpenAI API:", response.error.message);
+        await reddit.modMail.reply({
+            conversationId: message.conversationId,
+            body: json2md([
+                { p: "An error occurred while trying to translate the message. Error from OpenAI:" },
+                { blockquote: response.error.message },
+            ]),
+            isInternal: true,
+        });
+        return { message: `error from OpenAI API: ${response.error.message}` };
+    }
+
     const output = JSON.parse(response.output_text) as z.infer<typeof responseFormat>;
 
     await reddit.modMail.reply({
