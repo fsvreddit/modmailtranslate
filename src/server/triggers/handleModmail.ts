@@ -60,7 +60,7 @@ export const handleModmail = async (c: Context) => {
         }
         const languageForConversation = await getLanguageForConversation(modmailRequest.conversationId);
         if (languageForConversation) {
-            return c.json<TriggerResponse>(await handleTranslateUserMessage(modmailMessage), 200);
+            return c.json<TriggerResponse>(await handleTranslateUserMessage(modmailMessage, true), 200);
         } else {
             console.log(`${modmailRequest.messageId}: Message author is not a moderator and no language set for conversation. Ignoring modmail request.`);
             return c.json<TriggerResponse>({ message: "message author is not a moderator and no language set for conversation" }, 200);

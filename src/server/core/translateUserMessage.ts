@@ -6,7 +6,7 @@ import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
 import json2md from "json2md";
 
-export async function handleTranslateUserMessage (message: ModmailMessage): Promise<TriggerResponse> {
+export async function handleTranslateUserMessage (message: ModmailMessage, isAuto = false): Promise<TriggerResponse> {
     const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
     if (!lastMessageFromUser?.bodyMarkdown) {
         console.error("Modmail: Last message from user not found");
@@ -71,6 +71,11 @@ export async function handleTranslateUserMessage (message: ModmailMessage): Prom
     }
 
     const output = JSON.parse(response.output_text) as z.infer<typeof responseFormat>;
+
+    if (isAuto && output.detectedLanguage === targetLanguage) {
+        console.log(`${message.messageId}: Detected language is the same as target language ${targetLanguage} in auto-translate mode. Skipping translation for conversation ${message.conversationId}`);
+        return { message: "detected language is the same as target language in auto-translate mode, skipping translation" };
+    }
 
     await reddit.modMail.reply({
         conversationId: message.conversationId,
