@@ -6,21 +6,21 @@ Note: You need to set up an OpenAI API key to use this app, although ten free tr
 
 ### Translating a user's message
 
-Use the command `!translatethat` on its own in a modmail. The app will find the last message from the user and translate it to the language you have configured in the app's settings. It will tell you what the language.
+Use the command `!translate` **on its own** in a modmail. The app will find the last message from the user and translate it to the language you have configured in the app's settings. It will tell you the language that was detected, too.
 
 The app will translate the text of the previous message and respond as a private moderator note. Please remember to use a private mod note when issuing the command.
 
 ### Translating a message to a user
 
-Use the command `!translatethis` or `!translatethis French` or similar along with the message you wish to translate. If you have already translated a message from the user, it will assume you want to translate to the language the user used. For example:
+Use the command `!translate` or `!translate French` or similar along with the message you wish to translate on subsequent lines. If you have already translated a message from the user, it will assume you want to translate to the language the user used. For example:
 
-> !translatethis
+> !translate
 >
 > You were banned because you broke our rules on hate speech
 
 or if you want to specify the language:
 
-> !translatethis Russian
+> !translate Russian
 >
 > All posts on r/Rateme must include a verification image showing you holding a paper sign with the words "Rate me" on it
 

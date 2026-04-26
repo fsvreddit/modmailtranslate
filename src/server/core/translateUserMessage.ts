@@ -5,12 +5,7 @@ import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
 
-export async function handleTranslateThat (message: ModmailMessage): Promise<TriggerResponse> {
-    if (!message.messageBody.startsWith("!translatethat")) {
-        console.error("Modmail: Invalid !translatethat command format");
-        return { message: "invalid command format" };
-    }
-
+export async function handleTranslateUserMessage (message: ModmailMessage): Promise<TriggerResponse> {
     const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
     if (!lastMessageFromUser?.bodyMarkdown) {
         console.error("Modmail: Last message from user not found");

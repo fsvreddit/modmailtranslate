@@ -3,11 +3,11 @@ import { getAPIKey, getLanguageForConversation, incrementFreeTrialUses, ModmailM
 import { reddit, settings } from "@devvit/web/server";
 import OpenAI from "openai";
 
-export async function handleTranslateThis (message: ModmailMessage): Promise<TriggerResponse> {
-    const regex = /!translatethis( .+)?\n/;
+export async function handleTranslateModMessage (message: ModmailMessage): Promise<TriggerResponse> {
+    const regex = /!translate( .+)?\n/;
     const matches = regex.exec(message.messageBody);
     if (!matches || matches.length < 2) {
-        console.error("Modmail: Invalid !translatethis command format");
+        console.error("Modmail: Invalid !translate command format");
         return { message: "invalid command format" };
     }
 
@@ -17,7 +17,7 @@ export async function handleTranslateThis (message: ModmailMessage): Promise<Tri
     if (!language) {
         await reddit.modMail.reply({
             conversationId: message.conversationId,
-            body: "Could not determine target language for translation. Please specify a language using `!translatethis [language]`.",
+            body: "Could not determine target language for translation. Please specify a language using `!translate [language]` followed by the text to translate.",
             isInternal: true,
         });
         return { message: `language not specified for ${message.conversationId}` };
