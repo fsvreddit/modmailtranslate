@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { createServer, getServerPort } from "@devvit/web/server";
 import { getRequestListener } from "@hono/node-server";
-import { handleModmail } from "./triggers";
+import { handleAppInstall, handleAppUpgrade, handleModmail } from "./triggers";
 import { handleSelectFieldHasOptionChosen } from "./validators";
 import { setAPIKeyMenu } from "./menus";
 import { handleSetAPIKeyForm } from "./forms";
@@ -9,6 +9,8 @@ import { handleSetAPIKeyForm } from "./forms";
 const application = new Hono();
 
 // Triggers
+application.post("/internal/triggers/on-app-install", handleAppInstall);
+application.post("/internal/triggers/on-app-upgrade", handleAppUpgrade);
 application.post("/internal/triggers/on-modmail", handleModmail);
 
 // Settings validators

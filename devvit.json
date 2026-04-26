@@ -19,6 +19,8 @@
     "set-openai-key": "/internal/form/set-openai-key"
   },
   "triggers": {
+    "onAppInstall": "/internal/triggers/on-app-install",
+    "onAppUpgrade": "/internal/triggers/on-app-upgrade",
     "onModMail": "/internal/triggers/on-modmail"
   },
   "settings": {
