@@ -104,7 +104,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
     await reddit.modMail.reply({
         conversationId: message.conversationId,
         body: json2md([
-            { p: `Detected Language: ${output.detectedLanguage}. Translation::` },
+            { p: `Detected Language: ${output.detectedLanguage}. Translation:` },
             { blockquote: output.translatedText },
         ]),
         isInternal: true,
