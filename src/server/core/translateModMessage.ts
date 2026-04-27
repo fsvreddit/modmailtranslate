@@ -20,10 +20,16 @@ function getErrorMessage (error: unknown): string {
 }
 
 export async function handleTranslateModMessage (message: ModmailMessage): Promise<TriggerResponse> {
-    const regex = /!translate( .+)?\n/;
+    const firstLine = message.messageBody.split("\n")[0]?.trim();
+    if (!firstLine?.toLowerCase().startsWith("!translate")) {
+        console.log(`${message.messageId}: No !translate command found in message. Ignoring.`);
+        return { message: "no translation command found for this message" };
+    }
+
+    const regex = /!translate( .+)?/;
     const matches = regex.exec(message.messageBody);
     if (!matches || matches.length < 2) {
-        console.error("Modmail: Invalid !translate command format");
+        console.error("Modmail: Invalid !translate command format", matches);
         return { message: "invalid command format" };
     }
 

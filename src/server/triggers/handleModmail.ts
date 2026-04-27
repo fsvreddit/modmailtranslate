@@ -77,7 +77,7 @@ export const handleModmail = async (c: Context) => {
         return c.json<TriggerResponse>({ message: "no translation command found for this message" }, 200);
     }
 
-    const lineCount = modmailMessage.messageBody.split("\n").length;
+    const lineCount = modmailMessage.messageBody.split("\n").map(line => line.trim()).filter(line => line.length > 0).length;
 
     if (lineCount === 1) {
         return c.json<TriggerResponse>(await handleTranslateUserMessage(modmailMessage), 200);
