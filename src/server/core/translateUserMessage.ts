@@ -21,9 +21,30 @@ function getErrorMessage (error: unknown): string {
     return error instanceof Error ? error.message : "Unknown error";
 }
 
+export function getTextToTranslate (message: ModmailMessage): string | undefined {
+    const messages: string[] = [];
+    let foundMessageFromUser = false;
+    for (const msg of message.messagesInConversation) {
+        if (msg.author?.name !== message.participant) {
+            if (foundMessageFromUser) {
+                break;
+            } else {
+                continue;
+            }
+        }
+        if (!msg.bodyMarkdown) {
+            continue;
+        }
+        messages.unshift(msg.bodyMarkdown.trim());
+        foundMessageFromUser = true;
+    }
+
+    return messages.length > 0 ? messages.join("\n\n") : undefined;
+}
+
 export async function handleTranslateUserMessage (message: ModmailMessage, isAuto = false): Promise<TriggerResponse> {
-    const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
-    if (!lastMessageFromUser?.bodyMarkdown) {
+    const messageFromUser = getTextToTranslate(message);
+    if (!messageFromUser) {
         console.error("Modmail: Last message from user not found");
         await reddit.modMail.reply({
             conversationId: message.conversationId,
@@ -66,7 +87,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
                 },
                 {
                     role: "user",
-                    content: lastMessageFromUser.bodyMarkdown,
+                    content: messageFromUser,
                 },
             ],
             text: {
