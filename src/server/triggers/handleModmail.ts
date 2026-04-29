@@ -1,7 +1,8 @@
 import { OnModMailRequest, TriggerResponse } from "@devvit/web/shared";
 import { Context } from "hono";
-import { context, GetConversationResponse, reddit, settings } from "@devvit/web/server";
+import { context, GetConversationResponse, reddit, redis, settings } from "@devvit/web/server";
 import { AppSetting, getLanguageForConversation, handleTranslateUserMessage, handleTranslateModMessage, ModmailMessage } from "../core";
+import { addMonths } from "date-fns";
 
 export const handleModmail = async (c: Context) => {
     const modmailRequest = await c.req.json<OnModMailRequest>();
@@ -76,6 +77,13 @@ export const handleModmail = async (c: Context) => {
         console.log(`${modmailRequest.messageId}: No translation command found in message. Ignoring modmail request.`);
         return c.json<TriggerResponse>({ message: "no translation command found for this message" }, 200);
     }
+
+    const handledKey = `handled:${modmailRequest.messageId}`;
+    if (await redis.exists(handledKey)) {
+        console.log(`${modmailRequest.messageId}: Duplicate trigger, ignoring.`);
+        return c.json<TriggerResponse>({ message: "modmail message has already been handled" }, 200);
+    }
+    await redis.set(handledKey, "true", { expiration: addMonths(new Date(), 1) });
 
     const lineCount = modmailMessage.messageBody.split("\n").map(line => line.trim()).filter(line => line.length > 0).length;
 
