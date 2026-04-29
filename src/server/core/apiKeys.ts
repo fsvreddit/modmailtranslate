@@ -45,6 +45,7 @@ export async function incrementTranslationsThisMonth () {
         // expire after 31 days, which is enough to cover any month
         await redis.expire(getThisMonthsUsageKey(), 60 * 60 * 24 * 31);
     }
+    console.log(`Translations this month: ${newValue}`);
 }
 
 export async function setTranslationsThisMonth (value: number) {
