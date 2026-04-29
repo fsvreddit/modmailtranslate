@@ -52,6 +52,14 @@ OpenAI API calls for this app are individually very cheap, but costs could add u
 
 It would be greatly appreciated if you can provide your own key if you are a heavy user. I expect that the current quota of 50 translations per month will be sufficient for most subreddits.
 
+## Change History
+
+### v1.1
+
+* If a user has written multiple messages in quick succession, the whole sequence of messages gets translated rather than just the most recent message
+* Removed lifetime "free trial" model and move to a monthly free translations quota model
+* Prevent Dev Platform issues from causing issues by doing duplicate translations for the same message
+
 ## Source code
 
 Modmail Translator is open source under the BSD three-clause license. [You can find the source code on Github](https://github.com/fsvreddit/modmailtranslate).
