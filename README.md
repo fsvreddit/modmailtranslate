@@ -40,6 +40,18 @@ Example:
 
 ![Screenshot showing !translate command for a reply](https://raw.githubusercontent.com/fsvreddit/modmailtranslate/refs/heads/main/readme_images/translatereply.png)
 
+## FAQs
+
+### Why aren't all initial messages translated?
+
+The cost of OpenAI API calls would be substantially higher if all inbound messages were checked to see if they needed translation. Instead, to manage costs, initial translations are only done on demand. Using Continuous Mode you can decide to auto-translate subsequent messages from users when you know that users are likely to converse in a language your mod team does not understand.
+
+### Why do I have to provide an API key after a monthly quota is provided?
+
+OpenAI API calls for this app are individually very cheap, but costs could add up if this app becomes popular.
+
+It would be greatly appreciated if you can provide your own key if you are a heavy user. I expect that the current quota of 50 translations per month will be sufficient for most subreddits.
+
 ## Source code
 
 Modmail Translator is open source under the BSD three-clause license. [You can find the source code on Github](https://github.com/fsvreddit/modmailtranslate).
