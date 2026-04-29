@@ -1,11 +1,15 @@
 import { redis, settings } from "@devvit/web/server";
 import { AppSetting } from ".";
+import { endOfMonth, format } from "date-fns";
 
 const LOCAL_API_KEY = "localAPIKey";
-const FREE_TRIAL_USES = "freeTrialUses";
 
 export async function setLocalAPIKey (apiKey: string) {
     await redis.set(LOCAL_API_KEY, apiKey);
+}
+
+function getThisMonthsUsageKey (): string {
+    return `translationsThisMonth:${format(new Date(), "yyyy-MM")}`;
 }
 
 interface APIKeyResponse {
@@ -22,19 +26,27 @@ export async function getAPIKey (): Promise<APIKeyResponse> {
 
     const appSettings = await settings.getAll();
 
-    const freeTrialsAvailable = appSettings[AppSetting.FreeTrialUsesAvailable] as number | undefined ?? 0;
-    const freeTrialUsesValue = await redis.get(FREE_TRIAL_USES) ?? "0";
-    const freeTrialUses = parseInt(freeTrialUsesValue, 10);
+    const monthlyQuota = appSettings[AppSetting.FreeTranslationsPerMonth] as number | undefined ?? 0;
+    const translationsThisMonthValue = await redis.get(getThisMonthsUsageKey()) ?? "0";
+    const translationsThisMonth = parseInt(translationsThisMonthValue, 10);
 
     const globalAPIKey = appSettings[AppSetting.GlobalAPIKey] as string | undefined;
 
-    if (freeTrialsAvailable > freeTrialUses) {
-        return { apiKey: globalAPIKey, type: "global", freeTrialUsesLeft: freeTrialsAvailable - freeTrialUses };
+    if (monthlyQuota > translationsThisMonth) {
+        return { apiKey: globalAPIKey, type: "global", freeTrialUsesLeft: monthlyQuota - translationsThisMonth };
     } else {
         return {};
     }
 }
 
-export async function incrementFreeTrialUses () {
-    await redis.incrBy(FREE_TRIAL_USES, 1);
+export async function incrementTranslationsThisMonth () {
+    const newValue = await redis.incrBy(getThisMonthsUsageKey(), 1);
+    if (newValue === 1) {
+        // expire after 31 days, which is enough to cover any month
+        await redis.expire(getThisMonthsUsageKey(), 60 * 60 * 24 * 31);
+    }
+}
+
+export async function setTranslationsThisMonth (value: number) {
+    await redis.set(getThisMonthsUsageKey(), value.toString(), { expiration: endOfMonth(new Date()) });
 }

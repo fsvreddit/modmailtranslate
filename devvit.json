@@ -172,6 +172,12 @@
       },
       "freeTries": {
         "label": "Number of free translations before the OpenAI key is required",
+        "helpText": "Do not remove while any subreddits are on v1.0.0",
+        "type": "number",
+        "defaultValue": 25
+      },
+      "freeTranslationsPerMonth": {
+        "label": "Number of free translations per month before the OpenAI key is required (resets on the first of each month)",
         "type": "number",
         "defaultValue": 25
       },

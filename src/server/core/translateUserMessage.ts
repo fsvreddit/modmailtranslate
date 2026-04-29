@@ -1,6 +1,6 @@
 import { reddit, settings } from "@devvit/web/server";
 import { TriggerResponse } from "@devvit/web/shared";
-import { AppSetting, getAPIKey, getLanguage, incrementFreeTrialUses, ModmailMessage, setLanguageForConversation } from ".";
+import { AppSetting, getAPIKey, getLanguage, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
 import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
@@ -63,7 +63,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
     if (!apiKeyResponse.apiKey) {
         await reddit.modMail.reply({
             conversationId: message.conversationId,
-            body: "API key is not configured and you are out of free translations. Please set up your API key to use the translation feature.",
+            body: "API key is not configured and you are out of free translations for this month. Please set up your API key to use the translation feature.",
             isInternal: true,
         });
         return { message: `API key not configured for ${message.conversationId}` };
@@ -135,7 +135,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
 
     console.log(`${message.messageId}: Successfully translated message from ${output.detectedLanguage} to ${targetLanguage} and replied in modmail conversation ${message.conversationId}`);
     if (apiKeyResponse.type === "global") {
-        await incrementFreeTrialUses();
+        await incrementTranslationsThisMonth();
     }
 
     return { message: `translation successful for ${message.conversationId}` };
