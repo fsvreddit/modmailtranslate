@@ -1,5 +1,5 @@
 import { TriggerResponse } from "@devvit/web/shared";
-import { getAPIKey, getLanguageForConversation, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
+import { AppSetting, getAPIKey, getLanguageForConversation, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
 import { reddit, settings } from "@devvit/web/server";
 import OpenAI from "openai";
 import json2md from "json2md";
@@ -69,7 +69,8 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
     }
 
     await setLanguageForConversation(message.conversationId, language);
-    const model = await settings.get<string>("openAIModel") ?? "gpt-5.4-mini";
+    const appSettings = await settings.getAll();
+    const model = appSettings[AppSetting.OpenAIModel] as string | undefined ?? "gpt-5.4-mini";
 
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });
     let response;
@@ -105,6 +106,15 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
         console.error(`${message.messageId}: Empty translation response from OpenAI for conversation ${message.conversationId}`);
         await replyWithTranslationError(message.conversationId, errorMessage);
         return { message: "invalid OpenAI response format" };
+    }
+
+    if (appSettings[AppSetting.ShowQuotaLevels] && apiKeyResponse.type === "global") {
+        const freeTranslationsLeft = Math.max((apiKeyResponse.freeTranslationsLeft ?? 0) - 1, 0);
+        await reddit.modMail.reply({
+            conversationId: message.conversationId,
+            body: `Free translations left for this month: ${freeTranslationsLeft}`,
+            isInternal: true,
+        });
     }
 
     await reddit.modMail.reply({

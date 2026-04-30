@@ -125,12 +125,19 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
         return { message: "detected language is the same as target language in auto-translate mode, skipping translation" };
     }
 
+    const modmailOutput: json2md.DataObject[] = [
+        { p: `Detected Language: ${output.detectedLanguage}. Translation:` },
+        { blockquote: output.translatedText },
+    ];
+
+    if (appSettings[AppSetting.ShowQuotaLevels] && apiKeyResponse.type === "global") {
+        const freeTranslationsLeft = Math.max((apiKeyResponse.freeTranslationsLeft ?? 0) - 1, 0);
+        modmailOutput.push({ p: `Free translations left for this month: ${freeTranslationsLeft}` });
+    }
+
     await reddit.modMail.reply({
         conversationId: message.conversationId,
-        body: json2md([
-            { p: `Detected Language: ${output.detectedLanguage}. Translation:` },
-            { blockquote: output.translatedText },
-        ]),
+        body: json2md(modmailOutput),
         isInternal: true,
     });
 

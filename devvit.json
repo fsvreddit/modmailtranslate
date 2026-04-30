@@ -162,6 +162,12 @@
         "label": "Continuous translation mode",
         "helpText": "Continues to translate messages from the same user in the same conversation after the first mod-initiated translation",
         "defaultValue": false
+      },
+      "showQuotaLevels": {
+        "type": "boolean",
+        "label": "Show quota levels in modmail",
+        "helpText": "Shows the number of free translations left for the month in modmail when replying to a message (has no effect when using your own key)",
+        "defaultValue": false
       }
     },
     "global": {

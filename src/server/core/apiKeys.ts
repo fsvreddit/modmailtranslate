@@ -15,7 +15,7 @@ function getThisMonthsUsageKey (): string {
 interface APIKeyResponse {
     apiKey?: string;
     type?: "local" | "global";
-    freeTrialUsesLeft?: number;
+    freeTranslationsLeft?: number;
 }
 
 export async function getAPIKey (): Promise<APIKeyResponse> {
@@ -33,7 +33,7 @@ export async function getAPIKey (): Promise<APIKeyResponse> {
     const globalAPIKey = appSettings[AppSetting.GlobalAPIKey] as string | undefined;
 
     if (monthlyQuota > translationsThisMonth) {
-        return { apiKey: globalAPIKey, type: "global", freeTrialUsesLeft: monthlyQuota - translationsThisMonth };
+        return { apiKey: globalAPIKey, type: "global", freeTranslationsLeft: monthlyQuota - translationsThisMonth };
     } else {
         return {};
     }
