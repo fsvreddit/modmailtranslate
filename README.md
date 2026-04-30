@@ -52,6 +52,10 @@ OpenAI API calls for this app are individually very cheap, but costs could add u
 
 It would be greatly appreciated if you can provide your own key if you are a heavy user. I expect that the current quota of 50 translations per month will be sufficient for most subreddits.
 
+### A language my mod team uses isn't supported to translate to. Can it be added?
+
+Absolutely! Get in touch and I'll add it to the next version.
+
 ## Change History
 
 ### v1.1

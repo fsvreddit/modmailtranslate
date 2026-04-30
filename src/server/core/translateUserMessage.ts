@@ -23,8 +23,17 @@ function getErrorMessage (error: unknown): string {
 
 export function getTextToTranslate (message: ModmailMessage): string | undefined {
     const messages: string[] = [];
+    const accountsToSkip = new Set([
+        "bot-bouncer",
+        "modmail-userinfo",
+    ]);
+
     let foundMessageFromUser = false;
     for (const msg of message.messagesInConversation) {
+        if (msg.author?.name && accountsToSkip.has(msg.author.name)) {
+            continue;
+        }
+
         if (msg.author?.name !== message.participant) {
             if (foundMessageFromUser) {
                 break;
