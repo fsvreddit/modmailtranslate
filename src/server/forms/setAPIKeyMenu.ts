@@ -10,6 +10,7 @@ export const handleSetAPIKeyForm = async (c: Context) => {
     const { apiKey } = await c.req.json<SetAPIKeyFormData>();
 
     await setLocalAPIKey(apiKey);
+    console.log("Local API key updated.");
 
     return c.json<UiResponse>({
         showToast: {
