@@ -1,6 +1,6 @@
 import { reddit, settings } from "@devvit/web/server";
 import { TriggerResponse } from "@devvit/web/shared";
-import { AppSetting, getAPIKey, getLanguage, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
+import { AppSetting, deleteLanguageForConversation, getAPIKey, getLanguage, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
 import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
@@ -131,6 +131,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
 
     if (isAuto && output.detectedLanguage === targetLanguage) {
         console.log(`${message.messageId}: Detected language is the same as target language ${targetLanguage} in auto-translate mode. Skipping translation for conversation ${message.conversationId}`);
+        await deleteLanguageForConversation(message.conversationId);
         return { message: "detected language is the same as target language in auto-translate mode, skipping translation" };
     }
 
