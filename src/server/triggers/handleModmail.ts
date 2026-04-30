@@ -12,13 +12,8 @@ export const handleModmail = async (c: Context) => {
     }
 
     if (modmailRequest.conversationType !== "sr_user") {
-        console.log(`${modmailRequest.messageId}: Conversation ${modmailRequest.conversationId} is not a user conversation. Ignoring modmail request.`);
         return c.json<TriggerResponse>({ message: "conversation is not a user conversation" }, 200);
     }
-
-    console.log(`Received modmail request from ${modmailRequest.messageAuthorType}: ${modmailRequest.messageAuthor?.name}`);
-
-    console.log(`${modmailRequest.messageId}: Received modmail message from moderator ${modmailRequest.messageAuthor?.name}`);
 
     let conversation: GetConversationResponse;
     try {
@@ -31,11 +26,6 @@ export const handleModmail = async (c: Context) => {
         console.error(`${modmailRequest.messageId}: Error fetching conversation ${modmailRequest.conversationId}`, error);
         console.log(JSON.stringify(modmailRequest, null, 2));
         return c.json<TriggerResponse>({ message: "error fetching conversation" }, 500);
-    }
-
-    if (conversation.conversation.conversationType !== "sr_user") {
-        console.log(`${modmailRequest.messageId}: Conversation ${modmailRequest.conversationId} is not a user conversation. Ignoring modmail request.`);
-        return c.json<TriggerResponse>({ message: "conversation is not a user conversation" }, 200);
     }
 
     if (!conversation.conversation.participant?.name) {
@@ -61,26 +51,23 @@ export const handleModmail = async (c: Context) => {
     if (modmailRequest.messageAuthorType !== "ParticipatingAs_MODERATOR") {
         const continuousMode = await settings.get<boolean>(AppSetting.ContinuousTranslation);
         if (!continuousMode) {
-            console.log(`${modmailRequest.messageId}: Message author is not a moderator and continuous translation mode is disabled. Ignoring modmail request.`);
             return c.json<TriggerResponse>({ message: "message author is not a moderator and continuous translation mode is disabled" }, 200);
         }
         const languageForConversation = await getLanguageForConversation(modmailRequest.conversationId);
         if (languageForConversation) {
             return c.json<TriggerResponse>(await handleTranslateUserMessage(modmailMessage, true), 200);
         } else {
-            console.log(`${modmailRequest.messageId}: Message author is not a moderator and no language set for conversation. Ignoring modmail request.`);
             return c.json<TriggerResponse>({ message: "message author is not a moderator and no language set for conversation" }, 200);
         }
     }
 
     if (!modmailMessage.messageBody.startsWith("!translate")) {
-        console.log(`${modmailRequest.messageId}: No translation command found in message. Ignoring modmail request.`);
         return c.json<TriggerResponse>({ message: "no translation command found for this message" }, 200);
     }
 
     const handledKey = `handled:${modmailRequest.messageId}`;
     if (await redis.exists(handledKey)) {
-        console.log(`${modmailRequest.messageId}: Duplicate trigger, ignoring.`);
+        console.warn(`${modmailRequest.messageId}: Duplicate trigger, ignoring.`);
         return c.json<TriggerResponse>({ message: "modmail message has already been handled" }, 200);
     }
     await redis.set(handledKey, "true", { expiration: addMonths(new Date(), 1) });

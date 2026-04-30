@@ -42,6 +42,7 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
             body: "Could not determine target language for translation. Please specify a language using `!translate [language]` followed by the text to translate.",
             isInternal: true,
         });
+        console.error(`${message.messageId}: Language not specified in command and no language set for conversation ${message.conversationId}`);
         return { message: `language not specified for ${message.conversationId}` };
     }
 
@@ -52,6 +53,7 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
             body: "No message body found to translate. Please provide a message to translate.",
             isInternal: true,
         });
+        console.error(`${message.messageId}: No message body found to translate for conversation ${message.conversationId}`);
         return { message: `no message body found to translate for ${message.conversationId}` };
     }
 
@@ -62,6 +64,7 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
             body: "API key is not configured and you are out of free translations for this month. Please set up your API key to use the translation feature.",
             isInternal: true,
         });
+        console.error(`${message.messageId}: API key not configured for conversation ${message.conversationId}`);
         return { message: `API key not configured for ${message.conversationId}` };
     }
 

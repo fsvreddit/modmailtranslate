@@ -61,11 +61,14 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
 
     const apiKeyResponse = await getAPIKey();
     if (!apiKeyResponse.apiKey) {
-        await reddit.modMail.reply({
-            conversationId: message.conversationId,
-            body: "API key is not configured and you are out of free translations for this month. Please set up your API key to use the translation feature.",
-            isInternal: true,
-        });
+        if (!isAuto) {
+            await reddit.modMail.reply({
+                conversationId: message.conversationId,
+                body: "API key is not configured and you are out of free translations for this month. Please set up your API key to use the translation feature.",
+                isInternal: true,
+            });
+        }
+        console.error(`API key not configured for conversation ${message.conversationId}`);
         return { message: `API key not configured for ${message.conversationId}` };
     }
 
