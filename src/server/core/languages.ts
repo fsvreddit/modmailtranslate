@@ -13,6 +13,10 @@ export async function getLanguageForConversation (conversationId: string): Promi
     return await redis.get(getLanguageKeyForConversation(conversationId));
 }
 
+export async function deleteLanguageForConversation (conversationId: string) {
+    await redis.del(getLanguageKeyForConversation(conversationId));
+}
+
 export const LANGUAGES: Record<string, string> = {
     en: "English",
     ar: "Arabic",

@@ -1,6 +1,6 @@
 import { reddit, settings } from "@devvit/web/server";
 import { TriggerResponse } from "@devvit/web/shared";
-import { AppSetting, getAPIKey, getLanguage, incrementFreeTrialUses, ModmailMessage, setLanguageForConversation } from ".";
+import { AppSetting, deleteLanguageForConversation, getAPIKey, getLanguage, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
 import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
@@ -21,9 +21,39 @@ function getErrorMessage (error: unknown): string {
     return error instanceof Error ? error.message : "Unknown error";
 }
 
+export function getTextToTranslate (message: ModmailMessage): string | undefined {
+    const messages: string[] = [];
+    const accountsToSkip = new Set([
+        "bot-bouncer",
+        "modmail-userinfo",
+    ]);
+
+    let foundMessageFromUser = false;
+    for (const msg of message.messagesInConversation) {
+        if (msg.author?.name && accountsToSkip.has(msg.author.name)) {
+            continue;
+        }
+
+        if (msg.author?.name !== message.participant) {
+            if (foundMessageFromUser) {
+                break;
+            } else {
+                continue;
+            }
+        }
+        if (!msg.bodyMarkdown) {
+            continue;
+        }
+        messages.unshift(msg.bodyMarkdown.trim());
+        foundMessageFromUser = true;
+    }
+
+    return messages.length > 0 ? messages.join("\n\n") : undefined;
+}
+
 export async function handleTranslateUserMessage (message: ModmailMessage, isAuto = false): Promise<TriggerResponse> {
-    const lastMessageFromUser = message.messagesInConversation.find(msg => msg.author?.name === message.participant);
-    if (!lastMessageFromUser?.bodyMarkdown) {
+    const messageFromUser = getTextToTranslate(message);
+    if (!messageFromUser) {
         console.error("Modmail: Last message from user not found");
         await reddit.modMail.reply({
             conversationId: message.conversationId,
@@ -40,11 +70,14 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
 
     const apiKeyResponse = await getAPIKey();
     if (!apiKeyResponse.apiKey) {
-        await reddit.modMail.reply({
-            conversationId: message.conversationId,
-            body: "API key is not configured and you are out of free translations. Please set up your API key to use the translation feature.",
-            isInternal: true,
-        });
+        if (!isAuto) {
+            await reddit.modMail.reply({
+                conversationId: message.conversationId,
+                body: "API key is not configured and you are out of free translations for this month. Please set up your API key to use the translation feature.",
+                isInternal: true,
+            });
+        }
+        console.error(`API key not configured for conversation ${message.conversationId}`);
         return { message: `API key not configured for ${message.conversationId}` };
     }
 
@@ -66,7 +99,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
                 },
                 {
                     role: "user",
-                    content: lastMessageFromUser.bodyMarkdown,
+                    content: messageFromUser,
                 },
             ],
             text: {
@@ -98,15 +131,23 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
 
     if (isAuto && output.detectedLanguage === targetLanguage) {
         console.log(`${message.messageId}: Detected language is the same as target language ${targetLanguage} in auto-translate mode. Skipping translation for conversation ${message.conversationId}`);
+        await deleteLanguageForConversation(message.conversationId);
         return { message: "detected language is the same as target language in auto-translate mode, skipping translation" };
+    }
+
+    const modmailOutput: json2md.DataObject[] = [
+        { p: `Detected Language: ${output.detectedLanguage}. Translation:` },
+        { blockquote: output.translatedText },
+    ];
+
+    if (appSettings[AppSetting.ShowQuotaLevels] && apiKeyResponse.type === "global") {
+        const freeTranslationsLeft = Math.max((apiKeyResponse.freeTranslationsLeft ?? 0) - 1, 0);
+        modmailOutput.push({ p: `Free translations left for this month: ${freeTranslationsLeft}` });
     }
 
     await reddit.modMail.reply({
         conversationId: message.conversationId,
-        body: json2md([
-            { p: `Detected Language: ${output.detectedLanguage}. Translation:` },
-            { blockquote: output.translatedText },
-        ]),
+        body: json2md(modmailOutput),
         isInternal: true,
     });
 
@@ -114,7 +155,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
 
     console.log(`${message.messageId}: Successfully translated message from ${output.detectedLanguage} to ${targetLanguage} and replied in modmail conversation ${message.conversationId}`);
     if (apiKeyResponse.type === "global") {
-        await incrementFreeTrialUses();
+        await incrementTranslationsThisMonth();
     }
 
     return { message: `translation successful for ${message.conversationId}` };
