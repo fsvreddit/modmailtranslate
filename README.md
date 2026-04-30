@@ -59,6 +59,7 @@ It would be greatly appreciated if you can provide your own key if you are a hea
 * If a user has written multiple messages in quick succession, the whole sequence of messages gets translated rather than just the most recent message
 * Removed lifetime "free trial" model and move to a monthly free translations quota model
 * Prevent Dev Platform issues from causing issues by doing duplicate translations for the same message
+* Add option to show remaining free quota when translating messages
 
 ## Source code
 
