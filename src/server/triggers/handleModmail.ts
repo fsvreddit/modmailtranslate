@@ -1,7 +1,7 @@
 import { OnModMailRequest, TriggerResponse } from "@devvit/web/shared";
 import { Context } from "hono";
 import { context, GetConversationResponse, reddit, redis, settings } from "@devvit/web/server";
-import { AppSetting, getLanguageForConversation, handleTranslateUserMessage, handleTranslateModMessage, ModmailMessage } from "../core";
+import { AppSetting, getLanguageForConversation, handleTranslateUserMessage, handleTranslateModMessage, ModmailMessage, hasTriggerBeenHandled } from "../core";
 import { addMonths } from "date-fns";
 
 export const handleModmail = async (c: Context) => {
@@ -63,6 +63,10 @@ export const handleModmail = async (c: Context) => {
 
     if (!modmailMessage.messageBody.startsWith("!translate")) {
         return c.json<TriggerResponse>({ message: "no translation command found for this message" }, 200);
+    }
+
+    if (await hasTriggerBeenHandled(`modmail:${modmailRequest.messageId}`)) {
+        return c.json<TriggerResponse>({ message: "modmail message has already been handled" }, 200);
     }
 
     const handledKey = `handled:${modmailRequest.messageId}`;

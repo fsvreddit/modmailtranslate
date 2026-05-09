@@ -58,6 +58,10 @@ Absolutely! Get in touch and I'll add it to the next version.
 
 ## Change History
 
+### v1.1.1
+
+* Mitigate against duplicate actions if the Developer Platform is having issues
+
 ### v1.1
 
 * If a user has written multiple messages in quick succession, the whole sequence of messages gets translated rather than just the most recent message
