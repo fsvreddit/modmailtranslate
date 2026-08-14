@@ -88,6 +88,16 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
     const [targetLanguageValue] = appSettings[AppSetting.Language] as string[] | undefined ?? ["en"];
     const targetLanguage = getLanguage(targetLanguageValue) ?? "English";
 
+    const termsToLeaveUntranslatedSetting = appSettings[AppSetting.TermsToLeaveUntranslated] as string | undefined ?? "";
+    const termsToLeaveUntranslated = termsToLeaveUntranslatedSetting.split("\n").map(term => term.trim()).filter(term => term.length > 0);
+
+    let prompt = `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`;
+    const termsFoundInMessage = termsToLeaveUntranslated.filter(term => messageFromUser.toLowerCase().includes(term.toLowerCase()));
+
+    if (termsFoundInMessage.length > 0) {
+        prompt += `\n\nDo not translate the following terms/phrases but instead leave them in the original language:\n\n${termsFoundInMessage.map(term => `- ${term}`).join("\n")}`;
+    }
+
     let response;
     try {
         response = await openAi.responses.create({
@@ -95,7 +105,7 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
             input: [
                 {
                     role: "system",
-                    content: `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`,
+                    content: prompt,
                 },
                 {
                     role: "user",

@@ -3,6 +3,7 @@ export enum AppSetting {
     Language = "language",
     ContinuousTranslation = "continuousTranslation",
     ShowQuotaLevels = "showQuotaLevels",
+    TermsToLeaveUntranslated = "termsToLeaveUntranslated",
 
     // App-scoped settings
     GlobalAPIKey = "openAPIKey",

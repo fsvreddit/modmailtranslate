@@ -72,6 +72,16 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
     const appSettings = await settings.getAll();
     const model = appSettings[AppSetting.OpenAIModel] as string | undefined ?? "gpt-5.4-mini";
 
+    const termsToLeaveUntranslatedSetting = appSettings[AppSetting.TermsToLeaveUntranslated] as string | undefined ?? "";
+    const termsToLeaveUntranslated = termsToLeaveUntranslatedSetting.split("\n").map(term => term.trim()).filter(term => term.length > 0);
+
+    let prompt = `You are a helpful assistant that translates messages on Reddit to ${language}. Translate the attached message to ${language}, preserving the original markdown format if any.`;
+    const termsFoundInMessage = termsToLeaveUntranslated.filter(term => remainingMessage.toLowerCase().includes(term.toLowerCase()));
+
+    if (termsFoundInMessage.length > 0) {
+        prompt += `\n\nDo not translate the following terms/phrases but instead leave them in the original language:\n\n${termsFoundInMessage.map(term => `- ${term}`).join("\n")}`;
+    }
+
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });
     let response;
     try {
@@ -80,7 +90,7 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
             input: [
                 {
                     role: "system",
-                    content: `You are a helpful assistant that translates messages on Reddit to ${language}. Translate the attached message to ${language}, preserving the original markdown format if any.`,
+                    content: prompt,
                 },
                 {
                     role: "user",

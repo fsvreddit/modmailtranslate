@@ -168,6 +168,12 @@
         "label": "Show quota levels in modmail",
         "helpText": "Shows the number of free translations left for the month in modmail when replying to a message (has no effect when using your own key)",
         "defaultValue": false
+      },
+      "termsToLeaveUntranslated": {
+        "type": "paragraph",
+        "label": "A list of terms to leave untranslated",
+        "helpText": "A list of terms (one per line) that should not be translated (e.g., brand names, product names, etc.)",
+        "defaultValue": ""
       }
     },
     "global": {

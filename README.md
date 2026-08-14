@@ -58,6 +58,12 @@ Absolutely! Get in touch and I'll add it to the next version.
 
 ## Change History
 
+### v1.2.0
+
+* Added the ability to configure a list of terms that should be left untranslated (such as brand names or similar)
+* Validate OpenAI keys when setting them
+* Provide a method of removing OpenAI keys
+
 ### v1.1.1
 
 * Mitigate against duplicate actions if the Developer Platform is having issues

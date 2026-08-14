@@ -9,6 +9,7 @@ export const setAPIKeyMenu = (c: Context) => c.json<UiResponse>({
                 {
                     name: "apiKey",
                     label: "OpenAI API Key",
+                    helpText: "Enter your OpenAI API key, or 'delete' to remove the existing key.",
                     type: "string",
                     required: true,
                 },
