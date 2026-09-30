@@ -1,8 +1,9 @@
 import { TriggerResponse } from "@devvit/web/shared";
-import { AppSetting, getAPIKey, getLanguageForConversation, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
-import { reddit, settings } from "@devvit/web/server";
+import { AppSetting, getAPIKey, getErrorMessage, getLanguageForConversation, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
+import { reddit, redis, settings } from "@devvit/web/server";
 import OpenAI from "openai";
 import json2md from "json2md";
+import { addMonths } from "date-fns";
 
 async function replyWithTranslationError (conversationId: string, errorMessage: string) {
     await reddit.modMail.reply({
@@ -13,10 +14,6 @@ async function replyWithTranslationError (conversationId: string, errorMessage: 
         ]),
         isInternal: true,
     });
-}
-
-function getErrorMessage (error: unknown): string {
-    return error instanceof Error ? error.message : "Unknown error";
 }
 
 export async function handleTranslateModMessage (message: ModmailMessage): Promise<TriggerResponse> {
@@ -82,21 +79,37 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
         prompt += `\n\nDo not translate the following terms/phrases but instead leave them in the original language:\n\n${termsFoundInMessage.map(term => `- ${term}`).join("\n")}`;
     }
 
+    const input: OpenAI.Responses.ResponseInput = [
+        {
+            role: "system",
+            content: prompt,
+        },
+        {
+            role: "user",
+            content: remainingMessage,
+        },
+    ];
+
+    const cacheKey = `cachedTranslation:${JSON.stringify(input)}`;
+    const cachedResult = await redis.get(cacheKey);
+    if (cachedResult) {
+        await reddit.modMail.reply({
+            conversationId: message.conversationId,
+            body: cachedResult,
+            isAuthorHidden: true,
+        });
+
+        console.log(`${message.messageId}: Used cached translation`);
+
+        return { message: `translation successful for ${message.conversationId} (from cache)` };
+    }
+
     const openAi = new OpenAI({ apiKey: apiKeyResponse.apiKey });
-    let response;
+    let response: OpenAI.Responses.Response;
     try {
         response = await openAi.responses.create({
             model,
-            input: [
-                {
-                    role: "system",
-                    content: prompt,
-                },
-                {
-                    role: "user",
-                    content: remainingMessage,
-                },
-            ],
+            input,
         });
     } catch (error) {
         const errorMessage = getErrorMessage(error);
@@ -132,6 +145,8 @@ export async function handleTranslateModMessage (message: ModmailMessage): Promi
         body: response.output_text,
         isAuthorHidden: true,
     });
+
+    await redis.set(cacheKey, response.output_text, { expiration: addMonths(new Date(), 1) });
 
     console.log(`${message.messageId}: Successfully translated message to ${language} and replied in modmail conversation ${message.conversationId}`);
     if (apiKeyResponse.type === "global") {

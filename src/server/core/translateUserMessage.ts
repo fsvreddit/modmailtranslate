@@ -1,6 +1,6 @@
 import { reddit, settings } from "@devvit/web/server";
 import { TriggerResponse } from "@devvit/web/shared";
-import { AppSetting, deleteLanguageForConversation, getAPIKey, getLanguage, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
+import { AppSetting, deleteLanguageForConversation, getAPIKey, getErrorMessage, getLanguage, incrementTranslationsThisMonth, ModmailMessage, setLanguageForConversation } from ".";
 import z from "zod";
 import { OpenAI } from "openai/index.js";
 import { zodTextFormat } from "openai/helpers/zod.mjs";
@@ -15,10 +15,6 @@ async function replyWithTranslationError (conversationId: string, errorMessage: 
         ]),
         isInternal: true,
     });
-}
-
-function getErrorMessage (error: unknown): string {
-    return error instanceof Error ? error.message : "Unknown error";
 }
 
 export function getTextToTranslate (message: ModmailMessage): string | undefined {
@@ -91,14 +87,14 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
     const termsToLeaveUntranslatedSetting = appSettings[AppSetting.TermsToLeaveUntranslated] as string | undefined ?? "";
     const termsToLeaveUntranslated = termsToLeaveUntranslatedSetting.split("\n").map(term => term.trim()).filter(term => term.length > 0);
 
-    let prompt = `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message.`;
+    let prompt = `You are a helpful assistant that detects the language of the provided message on Reddit and translates it to ${targetLanguage}. Detect the language of the attached message and translate it to ${targetLanguage}, preserving the original markdown format if any, and separately return the language you detected in the message. If the language cannot be determined, return "unknown" for the language.`;
     const termsFoundInMessage = termsToLeaveUntranslated.filter(term => messageFromUser.toLowerCase().includes(term.toLowerCase()));
 
     if (termsFoundInMessage.length > 0) {
         prompt += `\n\nDo not translate the following terms/phrases but instead leave them in the original language:\n\n${termsFoundInMessage.map(term => `- ${term}`).join("\n")}`;
     }
 
-    let response;
+    let response: OpenAI.Responses.Response;
     try {
         response = await openAi.responses.create({
             model,
@@ -143,6 +139,12 @@ export async function handleTranslateUserMessage (message: ModmailMessage, isAut
         console.log(`${message.messageId}: Detected language is the same as target language ${targetLanguage} in auto-translate mode. Skipping translation for conversation ${message.conversationId}`);
         await deleteLanguageForConversation(message.conversationId);
         return { message: "detected language is the same as target language in auto-translate mode, skipping translation" };
+    }
+
+    if (output.detectedLanguage === "unknown") {
+        console.error(`${message.messageId}: Could not detect language for conversation ${message.conversationId}`);
+        await replyWithTranslationError(message.conversationId, "Could not detect language");
+        return { message: "could not detect language" };
     }
 
     const modmailOutput: json2md.DataObject[] = [

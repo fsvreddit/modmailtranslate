@@ -58,6 +58,11 @@ Absolutely! Get in touch and I'll add it to the next version.
 
 ## Change History
 
+### v1.3.0
+
+* Cache some translations to allow free translations to last longer when using Saved Responses
+* Add better handling for situations where the language could not be determined
+
 ### v1.2.0
 
 * Added the ability to configure a list of terms that should be left untranslated (such as brand names or similar)

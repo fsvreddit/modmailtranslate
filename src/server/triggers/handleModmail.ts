@@ -1,10 +1,11 @@
 import { OnModMailRequest, TriggerResponse } from "@devvit/web/shared";
 import { Context } from "hono";
 import { context, GetConversationResponse, reddit, redis, settings } from "@devvit/web/server";
-import { AppSetting, getLanguageForConversation, handleTranslateUserMessage, handleTranslateModMessage, ModmailMessage, hasTriggerBeenHandled } from "../core";
+import { AppSetting, getLanguageForConversation, handleTranslateUserMessage, handleTranslateModMessage, ModmailMessage } from "../core";
 import { addMonths } from "date-fns";
+import { hasTriggerBeenHandled } from "@fsvreddit/fsv-devvit-web-helpers";
 
-export const handleModmail = async (c: Context) => {
+export const handleModmail = async (c: Context): Promise<Response> => {
     const modmailRequest = await c.req.json<OnModMailRequest>();
 
     if (modmailRequest.messageAuthor?.name === context.appSlug) {
