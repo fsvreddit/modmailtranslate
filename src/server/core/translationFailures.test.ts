@@ -34,6 +34,10 @@ vi.mock("@devvit/web/server", () => ({
             reply: replyMock,
         },
     },
+    redis: {
+        get: vi.fn(),
+        set: vi.fn(),
+    },
     settings: {
         getAll: getAllMock,
         get: getSettingMock,
@@ -46,6 +50,7 @@ vi.mock("./index.js", () => ({
         OpenAIModel: "openAIModel",
     },
     getAPIKey: getAPIKeyMock,
+    getErrorMessage: (error: unknown) => error instanceof Error ? error.message : "Unknown error",
     getLanguage: getLanguageMock,
     getLanguageForConversation: getLanguageForConversationMock,
     incrementFreeTrialUses: incrementFreeTrialUsesMock,
