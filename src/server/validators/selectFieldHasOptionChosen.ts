@@ -1,7 +1,7 @@
 import { SettingsValidationRequest, SettingsValidationResponse } from "@devvit/web/shared";
 import type { Context } from "hono";
 
-export const handleSelectFieldHasOptionChosen = async (c: Context) => {
+export const handleSelectFieldHasOptionChosen = async (c: Context): Promise<Response> => {
     const validationRequest = await c.req.json<SettingsValidationRequest<string[]>>();
 
     if (validationRequest.value?.length !== 1) {

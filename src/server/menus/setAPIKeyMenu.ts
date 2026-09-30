@@ -1,7 +1,7 @@
 import { UiResponse } from "@devvit/web/shared";
 import { Context } from "hono";
 
-export const setAPIKeyMenu = (c: Context) => c.json<UiResponse>({
+export const setAPIKeyMenu = (c: Context): Response => c.json<UiResponse>({
     showForm: {
         name: "set-openai-key",
         form: {

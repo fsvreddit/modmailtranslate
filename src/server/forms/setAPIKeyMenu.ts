@@ -7,7 +7,7 @@ interface SetAPIKeyFormData {
     apiKey: string;
 }
 
-export const handleSetAPIKeyForm = async (c: Context) => {
+export const handleSetAPIKeyForm = async (c: Context): Promise<Response> => {
     const { apiKey } = await c.req.json<SetAPIKeyFormData>();
 
     if (apiKey.trim() === "delete") {
